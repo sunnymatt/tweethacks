@@ -13,10 +13,11 @@ export class MainController {
   }
 
   $onInit() {
-    /*this.$http.get('/api/things')
+    this.$http.get('/api/things')
       .then(response => {
         this.awesomeThings = response.data;
-      });*/
+        console.log(this.awesomeThings);
+      });
   }
 
   addThing() {

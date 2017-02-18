@@ -65,7 +65,6 @@ function handleError(res, statusCode) {
 
 // Gets a list of Things
 export function index(req, res) {
-  console.log('fuk');
   return Thing.find().exec()
     .then(respondWithResult(res))
     .catch(handleError(res));
