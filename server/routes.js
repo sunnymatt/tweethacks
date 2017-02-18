@@ -17,6 +17,8 @@ export default function (app) {
     access_token_secret: 'xSzlyhKtkc7fhI07mSeOzax8AJ7UkFSsELQintlSApA0F'
   });
 
+  let numTweets = 20;
+
   // Insert routes below
   app.use('/api/things', require('./api/thing'));
   app.use('/api/users', require('./api/user'));
@@ -24,16 +26,38 @@ export default function (app) {
 
   app.use('/auth', require('./auth').default);
 
+
+  app.get('/followers/:name', function(req, response) {
+    console.log(req.params.name)
+    var x = [];
+    twit.get('followers/list', {screen_name: req.params.name}, 
+      function(error, followers, res)
+      {
+        if(error) 
+        {
+          console.log("Error!!")
+          console.log(error)
+        } else 
+        {
+          for(var i in followers['users'])
+          {
+            console.log(i, ': ', followers['users'][i]['screen_name']);
+            x.push(followers['users'][i]['screen_name']);
+          }
+        }
+        response.status(200).send(x);
+      });
+
+  });
+
   app.get('/twitter', function (req, response) {
-    console.log('req.headers:');
-    console.log("headers:  ", req.headers);
-    let headers = JSON.parse(req.headers.names);
+    let names = JSON.parse(req.headers.names);
     response.status(200).send('lol');
-    for(var property in headers)
+    for(var property in names)
     {
-      let name = headers[property];
-      console.log(headers[property]);
-      twit.get('statuses/user_timeline', {screen_name: name, count: 20}, 
+      let name = names[property];
+      console.log(names[property]);
+      twit.get('statuses/user_timeline', {screen_name: name, count: numTweets}, 
         function(error, tweets, response)
         {
           if(error)
@@ -42,7 +66,11 @@ export default function (app) {
             console.log(error)
           } else 
           {
-            console.log(tweets[0]['text'])
+            console.log(name, ": ");
+            for(var i in tweets) 
+            {
+              console.log(i, ":  ", tweets[i]['text'])
+            }
           }
         })
     }
