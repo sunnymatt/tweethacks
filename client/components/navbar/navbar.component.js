@@ -4,26 +4,30 @@
 import angular from 'angular';
 
 export class NavbarComponent {
-  menu = [{
-    title: 'Home',
-    state: 'main'
-  }];
+	menu = [{
+			title: 'Home',
+			state: 'main'
+  },
+		{
+			title: 'About',
+			state: 'about'
+		 }];
 
-  isCollapsed = true;
+	isCollapsed = true;
 
-  constructor(Auth) {
-    'ngInject';
+	constructor(Auth) {
+		'ngInject';
 
-    this.isLoggedIn = Auth.isLoggedInSync;
-    this.isAdmin = Auth.isAdminSync;
-    this.getCurrentUser = Auth.getCurrentUserSync;
-  }
+		this.isLoggedIn = Auth.isLoggedInSync;
+		this.isAdmin = Auth.isAdminSync;
+		this.getCurrentUser = Auth.getCurrentUserSync;
+	}
 
 }
 
 export default angular.module('directives.navbar', [])
-  .component('navbar', {
-    template: require('./navbar.html'),
-    controller: NavbarComponent
-  })
-  .name;
+	.component('navbar', {
+		template: require('./navbar.html'),
+		controller: NavbarComponent
+	})
+	.name;

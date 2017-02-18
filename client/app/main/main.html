@@ -1,17 +1,29 @@
 <header class="hero-unit" id="banner">
-  <div class="container">
-    <h1>Make a sweet tweet.</h1>
-    <p class="lead">Use sentiment analysis and Twitter to be there for your friends when they need you the most.</p>
-  </div>
+	<div class="container">
+		<h1>Sweet Tweetment.</h1>
+		<p class="lead">Use sentiment analysis and Twitter to be there for your friends when they need you the most.</p>
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1">@</span>
+			<input type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+			<div class="input-group-btn">
+				<button class="btn btn-default" type="button">Search</button>
+			</div>
+		</div>
+	</div>
 </header>
 
 <div class="container">
-  <div class="row">
-    <div class="col-lg-12">
-      <h1 class="page-header">Features:</h1>
-      <ul class="nav nav-tabs nav-stacked col-md-4 col-lg-4 col-sm-6" ng-repeat="thing in $ctrl.awesomeThings">
-        <li><a href="#" uib-tooltip="{{thing.info}}">{{thing.name}}</a></li>
-      </ul>
-    </div>
-  </div>
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">Search</h1>
+			<p>Enter the twitter handle of someone you'd like to check up on:</p>
+			<div class="input-group">
+				<span class="input-group-addon" id="basic-addon1">@</span>
+				<input type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+				<div class="input-group-btn">
+					<button class="btn btn-default" type="button">Search</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
