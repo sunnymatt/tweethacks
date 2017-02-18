@@ -13,23 +13,23 @@ export class MainController {
   }
 
   $onInit() {
-    this.$http.get('/api/things')
+    /*this.$http.get('/api/things')
       .then(response => {
         this.awesomeThings = response.data;
-      });
+      });*/
   }
 
   addThing() {
-    if(this.newThing) {
+    /*if(this.newThing) {
       this.$http.post('/api/things', {
         name: this.newThing
       });
       this.newThing = '';
-    }
+    }*/
   }
 
   deleteThing(thing) {
-    this.$http.delete(`/api/things/${thing._id}`);
+    //this.$http.delete(`/api/things/${thing._id}`);
   }
 }
 
