@@ -27,12 +27,13 @@ export default function (app) {
   app.get('/twitter', function (req, response) {
     console.log('req.headers:');
     console.log("headers:  ", req.headers);
-    console.log(JSON.parse(req.headers.names))
+    let headers = JSON.parse(req.headers.names);
     response.status(200).send('lol');
-    /*for(let name in headers)
+    for(var property in headers)
     {
-      console.log(headers['names'][name])
-      /*twit.get('statuses/user_timeline', {screen_name: name, count: 20}, 
+      let name = headers[property];
+      console.log(headers[property]);
+      twit.get('statuses/user_timeline', {screen_name: name, count: 20}, 
         function(error, tweets, response)
         {
           if(error)
@@ -44,7 +45,7 @@ export default function (app) {
             console.log(tweets[0]['text'])
           }
         })
-    } */
+    }
   });
 
   // All undefined asset or api routes should return a 404
