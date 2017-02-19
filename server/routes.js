@@ -161,27 +161,27 @@ export default function (app) {
   app.get('/compute', function(req, response) {
     let scores = JSON.parse(req.headers.scores);
 
-    console.log(scores);
-
     var x = [];
     var y = [];
+    var total = 0;
     for(var index in scores){
        x.push(parseInt(index));
        y.push(parseFloat(scores[index])) 
+       total += parseFloat(scores[index]);
     }
-
-    console.log(x);
-    console.log(y);
+    console.log("Len: ", x.length)
+    var average = total/x.length
+    console.log("Avg: ", average)
 
     var lr = new LinearRegression(x,y);
-
-    console.log(lr);
 
     lr.train(function(err){
       if(err) { throw err; }
       var prediction = lr.predict(-1);
       if(prediction >= 1) prediction = 1;
       if(prediction <= 0) prediction = 0;
+      console.log('Prediction is ', prediction, ' and avg is', average)
+      prediction = Math.max(prediction, average)
 
       response.status(200).send(prediction.toString());
     }); 
