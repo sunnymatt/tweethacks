@@ -22,6 +22,8 @@ export default function (app) {
     api_key: 'e78c1e21b8baef3417e2fecd92d747e513d0ded6'
   })
 
+  let LinearRegression = require('shaman').LinearRegression;
+
   let numTweets = 20;
 
   // Insert routes below
@@ -97,7 +99,7 @@ export default function (app) {
           var ind_tweets = {};
           if(error)
           {
-            ind_tweets[i] = "error"
+            ind_tweets[0] = "error"
           } else 
           {
             for(var i in tweets) 
@@ -137,6 +139,7 @@ export default function (app) {
           if(err)
           {
             console.log('error')
+            numTweetsDone++;
           } else 
           {
             scores[index] = res['docEmotions'][req.params.emotion];
@@ -148,6 +151,37 @@ export default function (app) {
           }
         });
     }
+  });
+
+  //Takes in a vector of tweets to scores, starting with the newest tweet
+  //Predicts the sadness of the next tweet
+  app.get('/compute', function(req, response) {
+    let scores = JSON.parse(req.headers.scores);
+
+    console.log(scores);
+
+    var x = [];
+    var y = [];
+    for(var index in scores){
+       x.push(parseInt(index));
+       y.push(parseFloat(scores[index])) 
+    }
+
+    console.log(x);
+    console.log(y);
+
+    var lr = new LinearRegression(x,y);
+
+    console.log(lr);
+
+    lr.train(function(err){
+      if(err) { throw err; }
+      var prediction = lr.predict(-1);
+      if(prediction >= 1) prediction = 1;
+      if(prediction <= 0) prediction = 0;
+
+      response.status(200).send(prediction.toString());
+    }); 
   });
 
   //Get all mentions of any id in names (header)
