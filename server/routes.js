@@ -119,8 +119,8 @@ export default function (app) {
   });
 
   //analyze a map of indexes to tweets for the emotion specified in the get req
-  app.get('/analyze/:emotion', function(req, response) {
-    let tweets = JSON.parse(req.headers.tweets);
+  app.post('/analyze/:emotion', function(req, response) {
+    let tweets = JSON.parse(req.body.tweets);
 
     var scores = {};
 

@@ -68,7 +68,18 @@ export class MainController {
       }
     }).then(response => {
       self.friendsTweets = response.data;
-      console.log(self.friendsTweets);
+      //console.log(self.friendsTweets);
+      for(var friend in self.friendsTweets) {
+        self.$http({
+          method: 'POST',
+          url: '/analyze/sadness',
+          data: {
+            tweets: JSON.stringify(self.friendsTweets[friend])
+          }
+        }).then(response => {
+          console.log(response.data);
+        });
+      }
       self.searchExec = true;
       self.usersToCheck = {};
     });
