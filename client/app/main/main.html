@@ -1,24 +1,63 @@
-<header class="hero-unit" id="banner">
-	<div class="container">
-		<h1>Sweet Tweetment.</h1>
-		<p class="lead">Use sentiment analysis and Twitter to be there for your friends when they need you the most.</p>
-		<div class="input-group">
-			<span class="input-group-addon" id="basic-addon1">@</span>
-			<input type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
-			<div class="input-group-btn">
-				<button class="btn btn-default" type="button">Search</button>
-			</div>
-		</div>
-	</div>
+<header class="hero-unit" id="banner" ng-show="!mc.searchExec">
+  <div class="container">
+    <h1>Sweet Tweetment.</h1>
+    <p class="lead">Use sentiment analysis and Twitter to be there for your friends when they need you the most.</p>
+    <h2>Search your followers:</h2>
+    <div class="input-group">
+      <span class="input-group-addon" id="basic-addon1">@</span>
+      <input type="text" ng-model="mc.username" class="form-control" placeholder="Enter your twitter handle..." aria-describedby="basic-addon1">
+      <div class="input-group-btn">
+        <button ng-click="mc.addFollowersFromHandle(mc.username)" class="btn btn-default" type="button">Search</button>
+      </div>
+    </div>
+    <h3>or</h3>
+    <h2>Check by twitter handle:</h2>
+    <div class="input-group">
+      <span class="input-group-addon" id="basic-addon1">@</span>
+      <input type="text" ng-model="mc.friendname" class="form-control" placeholder="Enter any twitter handle..." aria-describedby="basic-addon1">
+      <div class="input-group-btn">
+        <button ng-click="mc.addUserToCheck(mc.friendname)" class="btn btn-default" type="button">Add</button>
+      </div>
+    </div>
+  </div>
 </header>
 
-<div class="container">
-	<div class="row">
-		<div class="col-lg-12">
-			<h1 class="page-header">Welcome to TweetHacks!</h1>
-			<p>Enter the twitter handle of someone you'd like to check up on in the search bar above.</p>
-			<div class="input-group">
-			</div>
-		</div>
-	</div>
+<div class="container" ng-if="!mc.searchExec">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Users for Checkup</h1>
+      <p ng-show="!mc.canCheckUsers()">Enter the twitter handle of someone you'd like to check up on in the search bar above.</p>
+      <div class="col-lg-2" ng-repeat="(index, userToCheck) in mc.usersToCheck">
+        <p>@{{userToCheck}} <a href ng-click="mc.removeUserToCheck(index)"><span class="glyphicon glyphicon-remove"></span></a></p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <button ng-show = "mc.canCheckUsers()" ng-click="mc.runSearch()" class="btn btn-info pull-right"><span class="glyphicon glyphicon-zoom-in"></span> Perform Checkup</button>
+  </div>
+</div>
+
+<div class="container" ng-if="mc.searchExec">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Search results for @{{username}}</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-2">
+      <div class="input-group-btn">
+        <button ng-click="mc.goBack()" class="btn btn-default" type="button">Back to Search</button>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div ng-repeat="(author, tweets) in mc.friendsTweets">
+      <h2>{{author}}</h2>
+      <ul>
+        <li ng-repeat="tweet in tweets">
+          {{tweet}}
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>

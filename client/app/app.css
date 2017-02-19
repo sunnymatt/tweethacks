@@ -41,6 +41,10 @@
   padding: 0.2em 0;
 }
 
+.glyphicon {
+  pointer-events: auto; 
+  cursor: pointer;
+}
 
 /* Component styles are injected through gulp */
 /* inject:css */
