@@ -26,23 +26,20 @@ export default function (app) {
 
   app.use('/auth', require('./auth').default);
 
-
+  
+  //Returns a map of indeces to follower screen_names for every follower
+  //of the name passed in the get request
   app.get('/followers/:name', function(req, response) {
     console.log(req.params.name)
     var x = {};
     twit.get('followers/list', {screen_name: req.params.name}, 
       function(error, followers, res)
       {
-        if(error) 
-        {
-          console.log("Error!!")
-          console.log(error)
-        } else 
+        if(!error) 
         {
           for(var i in followers['users'])
           {
-            console.log(i, ': ', followers['users'][i]['screen_name']);
-            x[i] = followers['users'][i]['screen_name'];
+            x[followers['users'][i]['name']] = followers['users'][i]['screen_name'];
           }
         }
         response.status(200).send(x);
@@ -50,6 +47,32 @@ export default function (app) {
 
   });
 
+  //Pass in the name of the follower in the follower field of the header
+  //Pass in the user id through the get request
+  app.get('/screen_name_by_name/:userid/', function(req, response) {
+    console.log(req.params.userid)
+    var follower = req.headers.follower;
+    var x = follower + " not found";
+    twit.get('followers/list', {screen_name: req.params.userid}, 
+      function(error, followers, res)
+      {
+        if(!error) 
+        {
+          for(var i in followers['users'])
+          {
+            if(follower == followers['users'][i]['name']) 
+            {
+              x = followers['users'][i]['screen_name'];
+            }
+
+          }
+        }
+        response.status(200).send(x);
+      });
+  });
+
+  //Returns an object of screen names to an array of up to 20 tweets for 
+  //All names passed in through the header
   app.get('/twitter', function (req, response) {
     let names = JSON.parse(req.headers.names);
 
@@ -62,7 +85,6 @@ export default function (app) {
     for(var property in names)
     {
       let name = names[property];
-      console.log(names[property]);
       twit.get('statuses/user_timeline', {screen_name: name, count: numTweets}, 
         function(error, tweets, res)
         {
@@ -70,18 +92,13 @@ export default function (app) {
           if(error)
           {
             ind_tweets.push("error")
-            console.log('Error!!')
-            console.log(error)
           } else 
           {
-            console.log(name, ": ");
             for(var i in tweets) 
             {
               ind_tweets.push(tweets[i]['text'])
-              //console.log(i, ":  ", tweets[i]['text'])
             }
           }
-          console.log(ind_tweets)
           all_tweets[name] = ind_tweets;
           numFollowersDone++;
 
