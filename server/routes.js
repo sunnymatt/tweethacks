@@ -187,40 +187,22 @@ export default function (app) {
     }); 
   });
 
-  app.get('/anger', function(req, response) {
-    let tweets = JSON.parse(req.body.tweets);
+  app.get('/compute/anger', function(req, response) {
+    let scores = JSON.parse(req.body.scores);
 
     var numAngry = 0;
 
-    var numTweets = Object.keys(tweets).length;
+    var numScores = Object.keys(scores).length;
     var numTweetsDone = 0;
 
     //Iterate over all the handles in the header
-    for(var property in tweets)
+    for(var property in scores)
     {
-      let tweet = tweets[property];
-      let obj = {'text': tweet}
-      let index = property;
-      alchemy_language.emotion(obj, function (err, res) {
-          if(err)
-          {
-            console.log('error')
-            numTweetsDone++;
-          } else 
-          {
-            var angriness = res['docEmotions'][req.params['anger']];
-            if(angriness > 0.5) 
-            {
-              numAngry++;
-            }
-            numTweetsDone++;
-            if(numTweets === numTweetsDone) 
-            {
-              response.status(200).send(scores);
-            }
-          }
-        });
+      if(scores[property] > 0.5) numAngry++;
     }
+
+    var percent = (100*numAngry)/numScores;
+    response.status(200).send(prediction.toString());
   });
 
   //Get all mentions of any id in names (header)
