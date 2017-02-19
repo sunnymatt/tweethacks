@@ -188,7 +188,7 @@ export default function (app) {
   });
 
   app.get('/compute/anger', function(req, response) {
-    let scores = JSON.parse(req.body.scores);
+    let scores = JSON.parse(req.headers.scores);
 
     var numAngry = 0;
 
@@ -202,7 +202,7 @@ export default function (app) {
     }
 
     var percent = (100*numAngry)/numScores;
-    response.status(200).send(prediction.toString());
+    response.status(200).send(percent.toString());
   });
 
   //Get all mentions of any id in names (header)
