@@ -33,14 +33,15 @@
     </div>
   </div>
   <div class="row">
-    <button ng-show = "mc.canCheckUsers()" ng-click="mc.runSearch()" class="btn btn-info pull-right"><span class="glyphicon glyphicon-zoom-in"></span> Perform Checkup</button>
+    <button ng-show="mc.canCheckUsers()" ng-click="mc.runSearch()" class="btn btn-info pull-right"><span class="glyphicon glyphicon-zoom-in"></span> Perform Checkup</button>
   </div>
 </div>
 
-<div class="container" ng-if="mc.searchExec">
+<div class="container" ng-show="mc.searchExec">
   <div class="row">
     <div class="col-lg-12">
-      <h1 class="page-header">Search results for @{{username}}</h1>
+      <h1 class="page-header">Checkup Results</h1>
+      <h3>Below you'll find users who have been flagged by our machine learning algorithms as at risk for potential trauma, depression, or just having a bad day. This tool is <b>not</b> meant to be used for diagnosis, but rather to encourage you to care for friends.</h3>
     </div>
   </div>
   <div class="row">
@@ -51,13 +52,18 @@
     </div>
   </div>
   <div class="row">
-    <div ng-repeat="(author, tweets) in mc.friendsTweets">
-      <h2>{{author}}</h2>
-      <ul>
-        <li ng-repeat="(key, tweet) in tweets">
-          {{tweet}}
-        </li>
-      </ul>
+    <div class="col-lg-12" ng-repeat="(author, tweets) in mc.friendsTweets">
+      <div ng-show="mc.friendsDepressScores[author] > 0.4">
+        <h2>@{{author}}</h2>
+        <h3 ng-style="mc.getColor(mc.friendsDepressScores[author])">Risk Level: {{mc.friendsDepressScores[author] | number:2}}</h3>
+        <div ng-style="mc.getColorRect(mc.friendsDepressScores[author])">&nbsp;</div>
+        <h4>Flagged tweets:</h4>
+        <blockquote ng-repeat="(key, tweet) in tweets" ng-show="mc.friendsTweetScores[author][key] > 0.7">
+          <p>{{tweet}}</p>
+          <footer>Risk Level: <span ng-style="mc.getColor(mc.friendsTweetScores[author][key])">{{mc.friendsTweetScores[author][key] | number:2}}</span></footer>
+        </blockquote>
+        <h4><a target="_blank" href="https://twitter.com/intent/tweet?text={{mc.makeTweet(author)}}">Make a sweet tweet</a></h4>
+      </div>
     </div>
   </div>
 </div>
