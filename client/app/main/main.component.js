@@ -28,7 +28,6 @@ export class MainController {
     this.$http.get('/api/things')
       .then(response => {
         this.awesomeThings = response.data;
-        console.log(this.awesomeThings);
       });
   }
 
@@ -67,6 +66,7 @@ export class MainController {
 
   runSearch() {
     var self = this;
+    console.log(this.usersToCheck);
     this.$http({
       method: 'GET',
       url: '/twitter',
@@ -75,8 +75,9 @@ export class MainController {
       }
     }).then(response => {
       self.friendsTweets = response.data;
-      //console.log(self.friendsTweets);
+      console.log("FRIENDS' TWEETS", self.friendsTweets);
       for(var friend in self.friendsTweets) {
+        console.log("Friend name: ", friend);
         let friendName = friend;
         self.$http({
           method: 'POST',
@@ -86,17 +87,19 @@ export class MainController {
           }
         }).then(response => {
           self.friendsTweetScores[friendName] = response.data;  // get scores for tweets
-          console.log(friendName, response.data);
-          self.$http({
-            method: 'GET',
-            url: '/compute',
-            headers: {
-              scores: JSON.stringify(response.data),
-            }
-          }).then(response => {
+          if(Object.keys(response.data).length > 0) {
             console.log(friendName, response.data);
-            self.friendsDepressScores[friendName] = parseFloat(response.data);
-          })
+            self.$http({
+              method: 'GET',
+              url: '/compute',
+              headers: {
+                scores: JSON.stringify(response.data),
+              }
+            }).then(response => {
+              console.log(friendName, response.data);
+              self.friendsDepressScores[friendName] = parseFloat(response.data);
+            })
+          }
         });
       }
       self.searchExec = true;
@@ -125,17 +128,19 @@ export class MainController {
           }
         }).then(response => {
           self.tweetsToUsersScores[friendName] = response.data;  // get scores for tweets
-          console.log(friendName, response.data);
-          self.$http({
-            method: 'GET',
-            url: '/compute/anger',
-            headers: {
-              scores: JSON.stringify(response.data),
-            }
-          }).then(response => {
-            console.log(friendName, response.data);
-            self.userVictimScores[friendName] = parseFloat(response.data);
-          })
+          //console.log(friendName, response.data);
+          if(Object.keys(response.data).length > 0){
+            self.$http({
+              method: 'GET',
+              url: '/compute/anger',
+              headers: {
+                scores: JSON.stringify(response.data),
+              }
+            }).then(response => {
+              //console.log(friendName, response.data);
+              self.userVictimScores[friendName] = parseFloat(response.data);
+            });
+          }
         });
       }
       self.harrassSearchExec = true;

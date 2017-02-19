@@ -41,7 +41,7 @@ export default function (app) {
   app.get('/followers/:name', function (req, response) {
     console.log(req.params.name)
     var x = {};
-    twit.get('followers/list', {
+    twit.get('friends/list', {
         screen_name: req.params.name
       },
       function (error, followers, res) {
@@ -82,7 +82,7 @@ export default function (app) {
   //All names passed in through the header
   app.get('/twitter', function (req, response) {
     let names = JSON.parse(req.headers.names);
-
+    console.log(names);
     var all_tweets = {};
 
     var numFollowers = Object.keys(names).length;
@@ -91,6 +91,7 @@ export default function (app) {
     //Iterate over all the handles in the header
     for (var property in names) {
       let name = names[property];
+      if(name.length === 1) continue;
       twit.get('statuses/user_timeline', {
           screen_name: name,
           count: numTweets
@@ -98,7 +99,7 @@ export default function (app) {
         function (error, tweets, res) {
           var ind_tweets = {};
           if (error) {
-            console.log("error")
+            console.log("error with getting tweets")
           } else {
             for (var i in tweets) {
               ind_tweets[i] = tweets[i]['text']
@@ -136,8 +137,11 @@ export default function (app) {
       let index = property;
       alchemy_language.emotion(obj, function (err, res) {
         if (err) {
-          console.log('error')
+          console.log('error with alchemy')
           numTweetsDone++;
+          if (numTweets === numTweetsDone) {
+            response.status(200).send(scores);
+          }
         } else {
           scores[index] = res['docEmotions'][req.params.emotion];
           numTweetsDone++;
