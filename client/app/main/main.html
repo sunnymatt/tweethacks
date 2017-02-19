@@ -54,7 +54,7 @@
     <div ng-repeat="(author, tweets) in mc.friendsTweets">
       <h2>{{author}}</h2>
       <ul>
-        <li ng-repeat="tweet in tweets">
+        <li ng-repeat="(key, tweet) in tweets">
           {{tweet}}
         </li>
       </ul>
