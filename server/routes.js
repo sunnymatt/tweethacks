@@ -9,6 +9,7 @@ import path from 'path';
 
 export default function (app) {
   let Twitter = require('twitter');
+  let watson = require('watson-developer-cloud');
 
   let twit = new Twitter({
     consumer_key: 'iq5MbK4YG0TcAICnyw9l7CUXf',
@@ -16,6 +17,10 @@ export default function (app) {
     access_token_key: '354089015-QkVdLx1wNGRsEeNYMk0i3ANkQp9hgwc9mlxLdpRu',
     access_token_secret: 'xSzlyhKtkc7fhI07mSeOzax8AJ7UkFSsELQintlSApA0F'
   });
+
+  var alchemy_language = watson.alchemy_language({
+    api_key: 'e78c1e21b8baef3417e2fecd92d747e513d0ded6'
+  })
 
   let numTweets = 20;
 
@@ -71,6 +76,7 @@ export default function (app) {
       });
   });
 
+
   //Returns an object of screen names to an array of up to 20 tweets for 
   //All names passed in through the header
   app.get('/twitter', function (req, response) {
@@ -88,7 +94,7 @@ export default function (app) {
       twit.get('statuses/user_timeline', {screen_name: name, count: numTweets}, 
         function(error, tweets, res)
         {
-          var ind_tweets = [];
+          var ind_tweets = {};
           if(error)
           {
             ind_tweets.push("error")
@@ -96,19 +102,102 @@ export default function (app) {
           {
             for(var i in tweets) 
             {
-              ind_tweets.push(tweets[i]['text'])
+              ind_tweets[i] = tweets[i]['text']
             }
           }
           all_tweets[name] = ind_tweets;
           numFollowersDone++;
 
-          if(numFollowers == numFollowersDone) 
+          if(numFollowers === numFollowersDone) 
           {    
             response.status(200).send(all_tweets);
           }
         });
     }
   });
+
+  app.get('/analyze/:emotion', function(req, response) {
+    let tweets = JSON.parse(req.headers.tweets);
+
+    var scores = {};
+
+    var numTweets = Object.keys(tweets).length;
+    var numTweetsDone = 0;
+    console.log(numTweets);
+    console.log("done", numTweetsDone);
+
+    //Iterate over all the handles in the header
+    for(var property in tweets)
+    {
+      let tweet = tweets[property];
+      let obj = {'text': tweet}
+      let index = property;
+      alchemy_language.emotion(obj, function (err, res) {
+          if(err)
+          {
+            console.log('error')
+          } else 
+          {
+            scores[index] = res['docEmotions'][req.params.emotion];
+            numTweetsDone++;
+            if(numTweets === numTweetsDone) 
+            {
+              response.status(200).send(scores);
+            }
+          }
+        });
+    }
+  });
+
+  //Incomplete
+  function analyzeEmotion (tweets, emotion) {
+    var scores = {};
+
+    var numTweets = Object.keys(tweets).length;
+    var numTweetsDone = 0;
+    console.log(numTweets);
+    console.log("done", numTweetsDone);
+
+    //Iterate over all the handles in the header
+    for(var property in tweets)
+    {
+      let tweet = tweets[property];
+      let obj = {'text': tweet}
+      let index = property;
+      alchemy_language.emotion(obj, function (err, res) {
+          if(err)
+          {
+            console.log('error')
+          } else 
+          {
+            scores[index] = res['docEmotions'][req.params.emotion];
+            numTweetsDone++;
+            if(numTweets === numTweetsDone) 
+            {
+              response.status(200).send(scores);
+            }
+          }
+        });
+    }
+  }
+
+
+  function analyzeText(tweet, type, callback)
+  {
+    var obj = {text: tweet}
+    alchemy_language.emotion(obj, function (err, res) {
+      if (err) {
+        console.log('error:', err);
+      }
+      else {
+        console.log("Score: ", res['docEmotions']['sadness'])
+        return res['docEmotions'][type];
+        callback();
+        //console.log(score);
+      }
+    });
+  }
+
 
   app.get('/mentions', function (req, res) {
     let names = JSON.parse(req.headers.names);
@@ -136,7 +225,7 @@ export default function (app) {
             all_mentions[userid] = mentions;
             numIDsDone++;
 
-            if(numIDsDone == numIDs) 
+            if(numIDsDone === numIDs) 
             {
               res.status(200).send(all_mentions);
             }
