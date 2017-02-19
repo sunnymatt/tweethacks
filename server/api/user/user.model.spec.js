@@ -28,49 +28,71 @@ describe('User Model', function() {
   });
 
   it('should begin with no users', function() {
-    return User.find({}).exec().should
+    return expect(User.find({}).exec()).to
       .eventually.have.length(0);
   });
 
   it('should fail when saving a duplicate user', function() {
-    return user.save()
+    return expect(user.save()
       .then(function() {
         var userDup = genUser();
         return userDup.save();
-      }).should.be.rejected;
+      })).to.be.rejected;
   });
 
   describe('#email', function() {
     it('should fail when saving with a blank email', function() {
       user.email = '';
-      return user.save().should.be.rejected;
+      return expect(user.save()).to.be.rejected;
     });
 
     it('should fail when saving with a null email', function() {
       user.email = null;
-      return user.save().should.be.rejected;
+      return expect(user.save()).to.be.rejected;
     });
 
     it('should fail when saving without an email', function() {
       user.email = undefined;
-      return user.save().should.be.rejected;
+      return expect(user.save()).to.be.rejected;
+    });
+
+    describe('given user provider is twitter', function() {
+      beforeEach(function() {
+        user.provider = 'twitter';
+      });
+
+      it('should succeed when saving without an email', function() {
+        user.email = null;
+        return expect(user.save()).to.be.fulfilled;
+      });
+    });
+
+    describe('given user provider is github', function() {
+      beforeEach(function() {
+        user.provider = 'github';
+      });
+
+      it('should succeed when saving without an email', function() {
+        user.email = null;
+        return expect(user.save()).to.be.fulfilled;
+      });
     });
   });
 
   describe('#password', function() {
     it('should fail when saving with a blank password', function() {
       user.password = '';
-      return user.save().should.be.rejected;
+      return expect(user.save()).to.be.rejected;
     });
 
     it('should fail when saving with a null password', function() {
       user.password = null;
-      return user.save().should.be.rejected;
+      return expect(user.save()).to.be.rejected;
     });
 
     it('should fail when saving without a password', function() {
       user.password = undefined;
-      return user.save().should.be.rejected;
+      return expect(user.save()).to.be.rejected;
     });
 
     describe('given the user has been previously saved', function() {
@@ -79,19 +101,41 @@ describe('User Model', function() {
       });
 
       it('should authenticate user if valid', function() {
-        user.authenticate('password').should.be.true;
+        expect(user.authenticate('password')).to.be.true;
       });
 
       it('should not authenticate user if invalid', function() {
-        user.authenticate('blah').should.not.be.true;
+        expect(user.authenticate('blah')).to.not.be.true;
       });
 
       it('should remain the same hash unless the password is updated', function() {
         user.name = 'Test User';
-        return user.save()
+        return expect(user.save()
           .then(function(u) {
             return u.authenticate('password');
-          }).should.eventually.be.true;
+          })).to.eventually.be.true;
+      });
+    });
+
+    describe('given user provider is twitter', function() {
+      beforeEach(function() {
+        user.provider = 'twitter';
+      });
+
+      it('should succeed when saving without a password', function() {
+        user.password = null;
+        return expect(user.save()).to.be.fulfilled;
+      });
+    });
+
+    describe('given user provider is github', function() {
+      beforeEach(function() {
+        user.provider = 'github';
+      });
+
+      it('should succeed when saving without a password', function() {
+        user.password = null;
+        return expect(user.save()).to.be.fulfilled;
       });
     });
   });

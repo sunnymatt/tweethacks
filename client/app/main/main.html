@@ -3,12 +3,21 @@
     <h1>Sweet Tweetment.</h1>
     <p class="lead">Use sentiment analysis and Twitter to be there for your friends when they need you the most.</p>
     <h2>Search your followers:</h2>
-    <div class="input-group">
+    <div class="input-group" ng-show="!mc.loggedIn()">
       <span class="input-group-addon" id="basic-addon1">@</span>
       <input type="text" ng-model="mc.username" class="form-control" placeholder="Enter your twitter handle..." aria-describedby="basic-addon1">
       <div class="input-group-btn">
         <button ng-click="mc.addFollowersFromHandle(mc.username)" class="btn btn-default" type="button">Search</button>
       </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-5"></div>
+      <div class="col-lg-2">
+        <div class="input-group btn-block" ng-show="mc.loggedIn()">
+          <button ng-click="mc.checkUpOnFriends()" class="btn btn-block btn-warning" type="button">Perform Checkup</button>
+        </div>
+      </div>
+      <div class="col-lg-5"></div>
     </div>
     <h3>or</h3>
     <h2>Check by twitter handle:</h2>
@@ -38,6 +47,29 @@
 </div>
 
 <div class="container" ng-show="mc.searchExec">
+  <div class="row" ng-show="mc.harrassSearchExec">
+    <div class="col-lg-12">
+      <h2>Harrassment Search Results</h2>
+    </div>
+    <div class="col-lg-2">
+      <div class="input-group-btn">
+        <button ng-click="mc.goBack()" class="btn btn-default" type="button">Back to Search</button>
+      </div>
+    </div>
+    <div class="col-lg-12" ng-repeat="(receiver, tweets) in mc.tweetsToUsers">
+      <div ng-show="mc.userVictimScores[receiver] > 0.05">
+        <h2>{{receiver}}</h2>
+        <h3 ng-style="mc.getColor(mc.friendsDepressScores[author])">Risk Level: {{mc.userVictimScores[receiver] | number:2}}</h3>
+        <div ng-style="mc.getColorRect(mc.userVictimScores[receiver])">&nbsp;</div>
+        <h4>Flagged tweets:</h4>
+        <blockquote ng-repeat="(key, tweet) in tweets" ng-show="mc.tweetsToUsersScores[receiver][key] > 0.3">
+          <p>{{tweet}}</p>
+          <footer>Risk Level: <span ng-style="mc.getColor(mc.tweetsToUsersScores[receiver][key])">{{mc.tweetsToUsersScores[receiver][key] | number:2}}</span></footer>
+        </blockquote>
+        <h4><a target="_blank" href="https://twitter.com/intent/tweet?text={{mc.makeTweet(receiver)}}">Make a sweet tweet</a></h4>
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-lg-12">
       <h1 class="page-header">Checkup Results</h1>
@@ -48,6 +80,9 @@
     <div class="col-lg-2">
       <div class="input-group-btn">
         <button ng-click="mc.goBack()" class="btn btn-default" type="button">Back to Search</button>
+      </div>
+      <div class="input-group-btn">
+        <button ng-click="mc.runHarrassmentSearch()" class="btn btn-info" type="button">Harrassment Search</button>
       </div>
     </div>
   </div>

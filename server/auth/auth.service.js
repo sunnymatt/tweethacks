@@ -78,5 +78,7 @@ export function setTokenCookie(req, res) {
   }
   var token = signToken(req.user._id, req.user.role);
   res.cookie('token', token);
+  res.cookie('screen_name', req.user.twitter.screen_name);
+  console.log(req.user);
   res.redirect('/');
 }

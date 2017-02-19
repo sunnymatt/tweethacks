@@ -13,10 +13,15 @@ export class MainController {
   friendsTweets = {};
   friendsTweetScores = {};
   friendsDepressScores = {};
+  tweetsToUsers = {};
+  tweetsToUsersScores = {};
+  userVictimScores = {};
+  harrassSearchExec = false;
 
   /*@ngInject*/
-  constructor($http) {
+  constructor($http, $cookies) {
     this.$http = $http;
+    this.$cookies = $cookies;
   }
 
   $onInit() {
@@ -95,12 +100,57 @@ export class MainController {
         });
       }
       self.searchExec = true;
-      self.usersToCheck = {};
+    });
+  }
+
+  runHarrassmentSearch() {
+    console.log("HARRASSMENT SEARCH");
+    var self = this;
+    this.$http({
+      method: 'GET',
+      url: '/mentions',
+      headers: {
+        names: JSON.stringify(this.usersToCheck)
+      }
+    }).then(response => {
+      self.tweetsToUsers = response.data;
+      //console.log(self.friendsTweets);
+      for(var friend in self.tweetsToUsers) {
+        let friendName = friend;
+        self.$http({
+          method: 'POST',
+          url: '/analyze/anger',
+          data: {
+            tweets: JSON.stringify(self.tweetsToUsers[friendName])
+          }
+        }).then(response => {
+          self.tweetsToUsersScores[friendName] = response.data;  // get scores for tweets
+          console.log(friendName, response.data);
+          self.$http({
+            method: 'GET',
+            url: '/compute/anger',
+            headers: {
+              scores: JSON.stringify(response.data),
+            }
+          }).then(response => {
+            console.log(friendName, response.data);
+            self.userVictimScores[friendName] = parseFloat(response.data);
+          })
+        });
+      }
+      self.harrassSearchExec = true;
     });
   }
 
   canCheckUsers() {
     return Object.keys(this.usersToCheck).length > 0;
+  }
+
+  harrassmentSearchPerformed() {
+    if(this.tweetsToUsers){
+      return true;
+    }
+    return false;
   }
 
   getColor(score) {
@@ -120,8 +170,34 @@ export class MainController {
     return encodeURIComponent('@'+user+' Hey! Just wanted to say hi and check in with you. Hope everything is going well, and I\'m always here for you!');
   }
 
+  checkUpOnFriends() {
+    var username = this.$cookies.get('screen_name');
+    var self = this;
+    this.$http.get('/followers/' + username)
+      .then(response => {
+        for (var follower in response.data) {
+          this.usersToCheck[Object.keys(this.usersToCheck).length] = response.data[follower]; // add one by one
+        }
+        this.runSearch();
+      });
+  }
+
+  loggedIn() {
+    if(this.$cookies.get('screen_name')){
+      return true;
+    }
+    return false;
+  }
+
   goBack() {
+    this.usersToCheck = {};
     this.searchExec = false;
+    this.friendname = "";
+    this.friendsTweets = {};
+    this.friendsTweetScores = {};
+    this.friendsDepressScores = {};
+    this.tweetsToUsers = {};
+    this.username = '';
   }
 }
 

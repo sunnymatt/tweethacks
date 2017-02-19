@@ -8,8 +8,9 @@ import routing from './account.routes';
 import login from './login';
 import settings from './settings';
 import signup from './signup';
+import oauthButtons from '../../components/oauth-buttons';
 
-export default angular.module('tweethacksApp.account', [uiRouter, login, settings, signup])
+export default angular.module('testerApp.account', [uiRouter, login, settings, signup, oauthButtons])
   .config(routing)
   .run(function($rootScope) {
     'ngInject';

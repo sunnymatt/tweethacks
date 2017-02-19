@@ -12,19 +12,22 @@ describe('Component: MainComponent', function() {
   var scope;
   var mainComponent;
   var state;
+  var cookies;
   var $httpBackend;
 
   // Initialize the controller and a mock scope
-  beforeEach(inject(function(_$httpBackend_, $http, $componentController, $rootScope, $state) {
+  beforeEach(inject(function(_$httpBackend_, $http, $componentController, $rootScope, $cookies, $state) {
     $httpBackend = _$httpBackend_;
     $httpBackend.expectGET('/api/things')
       .respond(['HTML5 Boilerplate', 'AngularJS', 'Karma', 'Express']);
 
     scope = $rootScope.$new();
     state = $state;
+    cookies = $cookies;
     mainComponent = $componentController('main', {
       $http,
-      $scope: scope
+      $scope: scope,
+      $cookies: cookies
     });
   }));
 
