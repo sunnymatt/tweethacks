@@ -107,7 +107,10 @@ export default function (app) {
               ind_tweets[i] = tweets[i]['text']
             }
           }
-          all_tweets[name] = ind_tweets;
+          if(Object.keys(ind_tweets).length != 0) 
+          {
+            all_tweets[name] = ind_tweets;
+          }
           numFollowersDone++;
 
           if(numFollowers === numFollowersDone) 
@@ -191,8 +194,6 @@ export default function (app) {
 
     var numTweets = Object.keys(tweets).length;
     var numTweetsDone = 0;
-    console.log(numTweets);
-    console.log("done", numTweetsDone);
 
     //Iterate over all the handles in the header
     for(var property in tweets)
@@ -207,7 +208,11 @@ export default function (app) {
             numTweetsDone++;
           } else 
           {
-            scores[index] = res['docEmotions'][req.params.emotion];
+            var angriness = res['docEmotions'][req.params['anger']];
+            if(angriness > 0.5) 
+            {
+              numAngry++;
+            }
             numTweetsDone++;
             if(numTweets === numTweetsDone) 
             {
