@@ -114,6 +114,11 @@ export class MainController {
       'width': Math.round(500*score)+'px'
     };
   }
+  
+  makeTweet(user) {
+    //console.log(user);
+    return encodeURIComponent('@'+user+' Hey! Just wanted to say hi and check in with you. Hope everything is going well, and I\'m always here for you!');
+  }
 
   goBack() {
     this.searchExec = false;
