@@ -11,6 +11,8 @@ export class MainController {
   friendname = '';
   usersToCheck = {};
   friendsTweets = {};
+  friendsTweetScores = {};
+  friendsDepressScores = {};
 
   /*@ngInject*/
   constructor($http) {
@@ -70,14 +72,26 @@ export class MainController {
       self.friendsTweets = response.data;
       //console.log(self.friendsTweets);
       for(var friend in self.friendsTweets) {
+        let friendName = friend;
         self.$http({
           method: 'POST',
           url: '/analyze/sadness',
           data: {
-            tweets: JSON.stringify(self.friendsTweets[friend])
+            tweets: JSON.stringify(self.friendsTweets[friendName])
           }
         }).then(response => {
-          console.log(response.data);
+          self.friendsTweetScores[friendName] = response.data;  // get scores for tweets
+          console.log(friendName, response.data);
+          self.$http({
+            method: 'GET',
+            url: '/compute',
+            headers: {
+              scores: JSON.stringify(response.data),
+            }
+          }).then(response => {
+            console.log(friendName, response.data);
+            self.friendsDepressScores[friendName] = parseFloat(response.data);
+          })
         });
       }
       self.searchExec = true;
@@ -87,6 +101,18 @@ export class MainController {
 
   canCheckUsers() {
     return Object.keys(this.usersToCheck).length > 0;
+  }
+
+  getColor(score) {
+    return {'color': 'rgba(255,'+Math.round(255*(1-score))+',0,1)'};
+  }
+
+  getColorRect(score) {
+    return {
+      'background-color': 'rgba(255,'+Math.round(255*(1-score))+',0,1)',
+      //'height': '20px',
+      'width': Math.round(500*score)+'px'
+    };
   }
 
   goBack() {

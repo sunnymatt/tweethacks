@@ -33,14 +33,15 @@
     </div>
   </div>
   <div class="row">
-    <button ng-show = "mc.canCheckUsers()" ng-click="mc.runSearch()" class="btn btn-info pull-right"><span class="glyphicon glyphicon-zoom-in"></span> Perform Checkup</button>
+    <button ng-show="mc.canCheckUsers()" ng-click="mc.runSearch()" class="btn btn-info pull-right"><span class="glyphicon glyphicon-zoom-in"></span> Perform Checkup</button>
   </div>
 </div>
 
-<div class="container" ng-if="mc.searchExec">
+<div class="container" ng-show="mc.searchExec">
   <div class="row">
     <div class="col-lg-12">
-      <h1 class="page-header">Search results for @{{username}}</h1>
+      <h1 class="page-header">Checkup Results</h1>
+      <h3>Below you'll find users who have been flagged by our machine learning algorithms as at risk for potential trauma, depression, or other mental illness. This tool is <b>not</b> meant to be used for diagnosis, but rather to help you care for friends in the age of the internet.</h3>
     </div>
   </div>
   <div class="row">
@@ -51,13 +52,17 @@
     </div>
   </div>
   <div class="row">
-    <div ng-repeat="(author, tweets) in mc.friendsTweets">
-      <h2>{{author}}</h2>
-      <ul>
-        <li ng-repeat="(key, tweet) in tweets">
-          {{tweet}}
-        </li>
-      </ul>
+    <div class="col-lg-12" ng-repeat="(author, tweets) in mc.friendsTweets">
+      <div ng-show="mc.friendsDepressScores[author] > 0.4">
+        <h2>@{{author}}</h2>
+        <h3 ng-style="mc.getColor(mc.friendsDepressScores[author])">Risk Level: {{mc.friendsDepressScores[author] | number:2}}</h3>
+        <div ng-style="mc.getColorRect(mc.friendsDepressScores[author])">&nbsp;</div>
+        <h4>Flagged tweets:</h4>
+          <blockquote ng-repeat="(key, tweet) in tweets" ng-show="mc.friendsTweetScores[author][key] > 0.75">
+            <p>{{tweet}}</p>
+            <footer>Risk Level: <span ng-style="mc.getColor(mc.friendsTweetScores[author][key])">{{mc.friendsTweetScores[author][key]}}</span></footer>
+          </blockquote>
+      </div>
     </div>
   </div>
 </div>
