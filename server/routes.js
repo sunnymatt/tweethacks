@@ -29,7 +29,7 @@ export default function (app) {
 
   app.get('/followers/:name', function(req, response) {
     console.log(req.params.name)
-    var x = [];
+    var x = {};
     twit.get('followers/list', {screen_name: req.params.name}, 
       function(error, followers, res)
       {
@@ -42,7 +42,7 @@ export default function (app) {
           for(var i in followers['users'])
           {
             console.log(i, ': ', followers['users'][i]['screen_name']);
-            x.push(followers['users'][i]['screen_name']);
+            x[i] = followers['users'][i]['screen_name'];
           }
         }
         response.status(200).send(x);
