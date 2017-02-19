@@ -52,16 +52,24 @@ export default function (app) {
 
   app.get('/twitter', function (req, response) {
     let names = JSON.parse(req.headers.names);
-    response.status(200).send('lol');
+
+    var all_tweets = {};
+
+    var numFollowers = Object.keys(names).length;
+    var numFollowersDone = 0;
+
+    //Iterate over all the handles in the header
     for(var property in names)
     {
       let name = names[property];
       console.log(names[property]);
       twit.get('statuses/user_timeline', {screen_name: name, count: numTweets}, 
-        function(error, tweets, response)
+        function(error, tweets, res)
         {
+          var ind_tweets = [];
           if(error)
           {
+            ind_tweets.push("error")
             console.log('Error!!')
             console.log(error)
           } else 
@@ -69,10 +77,19 @@ export default function (app) {
             console.log(name, ": ");
             for(var i in tweets) 
             {
-              console.log(i, ":  ", tweets[i]['text'])
+              ind_tweets.push(tweets[i]['text'])
+              //console.log(i, ":  ", tweets[i]['text'])
             }
           }
-        })
+          console.log(ind_tweets)
+          all_tweets[name] = ind_tweets;
+          numFollowersDone++;
+
+          if(numFollowers == numFollowersDone) 
+          {    
+            response.status(200).send(all_tweets);
+          }
+        });
     }
   });
 
