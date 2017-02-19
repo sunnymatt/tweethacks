@@ -97,7 +97,7 @@ export default function (app) {
           var ind_tweets = {};
           if(error)
           {
-            ind_tweets.push("error")
+            ind_tweets[i] = "error"
           } else 
           {
             for(var i in tweets) 
