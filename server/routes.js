@@ -116,6 +116,7 @@ export default function (app) {
     }
   });
 
+  //analyze a map of indexes to tweets for the emotion specified in the get req
   app.get('/analyze/:emotion', function(req, response) {
     let tweets = JSON.parse(req.headers.tweets);
 
@@ -149,56 +150,7 @@ export default function (app) {
     }
   });
 
-  //Incomplete
-  function analyzeEmotion (tweets, emotion) {
-    var scores = {};
-
-    var numTweets = Object.keys(tweets).length;
-    var numTweetsDone = 0;
-    console.log(numTweets);
-    console.log("done", numTweetsDone);
-
-    //Iterate over all the handles in the header
-    for(var property in tweets)
-    {
-      let tweet = tweets[property];
-      let obj = {'text': tweet}
-      let index = property;
-      alchemy_language.emotion(obj, function (err, res) {
-          if(err)
-          {
-            console.log('error')
-          } else 
-          {
-            scores[index] = res['docEmotions'][req.params.emotion];
-            numTweetsDone++;
-            if(numTweets === numTweetsDone) 
-            {
-              response.status(200).send(scores);
-            }
-          }
-        });
-    }
-  }
-
-
-  function analyzeText(tweet, type, callback)
-  {
-    var obj = {text: tweet}
-    alchemy_language.emotion(obj, function (err, res) {
-      if (err) {
-        console.log('error:', err);
-      }
-      else {
-        console.log("Score: ", res['docEmotions']['sadness'])
-        return res['docEmotions'][type];
-        callback();
-        //console.log(score);
-      }
-    });
-  }
-
-
+  //Get all mentions of any id in names (header)
   app.get('/mentions', function (req, res) {
     let names = JSON.parse(req.headers.names);
 
