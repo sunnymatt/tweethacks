@@ -110,6 +110,41 @@ export default function (app) {
     }
   });
 
+  app.get('/mentions', function (req, res) {
+    let names = JSON.parse(req.headers.names);
+
+    var all_mentions = {};
+
+    var numIDs = Object.keys(names).length;
+    var numIDsDone = 0;
+
+    //Iterate over all the handles in the header
+    for(var property in names)
+    {
+      let userid = '@' + names[property];
+      twit.get('search/tweets', {q: userid}, 
+        function(error, tweets, response){
+          if(!error) {
+            var mentions = []
+            console.log(tweets);
+            for(var i in tweets['statuses'])
+            {
+              if(tweets['statuses'][i]['user']['screen_name'] != req.params.userid) {
+                mentions.push(tweets['statuses'][i]['text'])
+              }
+            }
+            all_mentions[userid] = mentions;
+            numIDsDone++;
+
+            if(numIDsDone == numIDs) 
+            {
+              res.status(200).send(all_mentions);
+            }
+          }
+        });
+    }
+  });
+
   // All undefined asset or api routes should return a 404
   app.route('/:url(api|auth|components|app|bower_components|assets)/*')
     .get(errors[404]);
