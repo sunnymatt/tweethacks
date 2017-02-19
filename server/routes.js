@@ -99,7 +99,7 @@ export default function (app) {
           var ind_tweets = {};
           if(error)
           {
-            ind_tweets[0] = "error"
+            console.log("error")
           } else 
           {
             for(var i in tweets) 
@@ -182,6 +182,40 @@ export default function (app) {
 
       response.status(200).send(prediction.toString());
     }); 
+  });
+
+  app.get('/anger', function(req, response) {
+    let tweets = JSON.parse(req.body.tweets);
+
+    var numAngry = 0;
+
+    var numTweets = Object.keys(tweets).length;
+    var numTweetsDone = 0;
+    console.log(numTweets);
+    console.log("done", numTweetsDone);
+
+    //Iterate over all the handles in the header
+    for(var property in tweets)
+    {
+      let tweet = tweets[property];
+      let obj = {'text': tweet}
+      let index = property;
+      alchemy_language.emotion(obj, function (err, res) {
+          if(err)
+          {
+            console.log('error')
+            numTweetsDone++;
+          } else 
+          {
+            scores[index] = res['docEmotions'][req.params.emotion];
+            numTweetsDone++;
+            if(numTweets === numTweetsDone) 
+            {
+              response.status(200).send(scores);
+            }
+          }
+        });
+    }
   });
 
   //Get all mentions of any id in names (header)
